@@ -2,24 +2,58 @@
 
 A self-hosted, high-performance email countdown timer generator that creates dynamic countdown images for email marketing campaigns. Built with Node.js, Express, and Sharp for optimal performance.
 
-## Features
+![Email Countdown Builder](https://img.shields.io/badge/Node.js-18+-green) ![Express](https://img.shields.io/badge/Express-5.x-blue) ![License](https://img.shields.io/badge/License-MIT-yellow)
 
-- **Dynamic Countdown Generation**: Real-time countdown timers that update based on target date/time
-- **Multiple Templates**: Choose from Boxed, Minimal, or Minimal Narrow styles
-- **Full Customization**: Customize colors (background, text, accents) with a built-in color picker
-- **Email Client Compatible**: Generates PNG images that work in all major email clients (Gmail, Outlook, etc.)
-- **High Performance**: 5-second in-memory caching handles 15,000+ emails/day efficiently
-- **Timezone Support**: Proper timezone handling with dayjs
-- **24-Hour Time Format**: Professional time display
-- **Responsive Design**: Clean, modern UI with mobile support
+## ✨ Features
+
+### Core
+
+- **Dynamic Countdown Generation**: Real-time countdown timers that update on each request
+- **Multiple Templates**: Boxed, Minimal, and Compact styles
+- **Full Customization**: Colors, fonts, labels via color picker UI or URL parameters
+- **Email Client Compatible**: PNG images work in Gmail, Outlook, Apple Mail, and all major clients
+
+### UI/UX
+
+- **Live Preview**: Real-time preview updates as you customize
+- **Theme Presets**: 8 built-in color themes (Dark Gold, Midnight Blue, Forest Green, etc.)
+- **Quick Duration Buttons**: +1h, +24h, +48h, +1 week shortcuts
+- **Timezone Search**: Filter through 400+ timezones
+- **Multiple Export Formats**: HTML, Markdown, or URL-only snippets
+- **Keyboard Shortcuts**: Ctrl+Enter to apply, Ctrl+C to copy
+- **Toast Notifications**: Visual feedback for actions
+- **Mobile Responsive**: Works on all screen sizes
+
+### Performance
+
+- **LRU Cache**: 5-second in-memory cache (1000 entries max)
+- **Optimized PNG**: Sharp with compression, adaptive filtering, palette mode
+- **Memory Monitoring**: Health endpoint with memory stats
+- **Handles 15,000+ emails/day** on 2GB RAM
 
 ## Tech Stack
 
-- **Node.js** - Runtime environment
-- **Express 5** - Web framework
-- **Sharp** - High-performance image processing (SVG to PNG conversion)
-- **Day.js** - Lightweight date/time manipulation
-- **Pickr** - Advanced color picker component
+- **Node.js 18+** - Runtime environment
+- **Express 5.x** - Web framework
+- **Sharp** - High-performance image processing (SVG → PNG)
+- **Day.js** - Lightweight date/time with timezone support
+- **Pickr** - Color picker component
+- **dotenv** - Environment configuration
+
+## Project Structure
+
+```
+src/
+├── app.js              # Express app entry point
+├── config/             # Configuration (defaults, timezones, constants)
+├── middleware/         # CORS, logging
+├── routes/             # API endpoints (/, /timer.svg, /timer.png, /health)
+├── services/           # Cache, countdown calculation
+├── templates/          # SVG templates + HTML page
+└── utils/              # Sanitization, HTML escaping, date helpers
+```
+
+See [AGENTS.md](AGENTS.md) for detailed documentation for AI agents and contributors.
 
 ## Requirements
 
@@ -62,10 +96,11 @@ NODE_ENV=production
 ### 4. Test the Application
 
 ```bash
-npm start
+npm start        # Production
+npm run dev      # Development with hot reload
 ```
 
-Visit `http://localhost:9500` to verify it's working.
+Visit `http://localhost:3000` to verify it's working (default port is 3000).
 
 ## Production Setup
 
@@ -118,8 +153,8 @@ User=your-username
 Group=your-username
 WorkingDirectory=/path/to/email-countdown-builder
 Environment="NODE_ENV=production"
-Environment="PORT=9500"
-ExecStart=/usr/bin/node /path/to/email-countdown-builder/server.js
+Environment="PORT=3000"
+ExecStart=/usr/bin/node /path/to/email-countdown-builder/src/app.js
 Restart=always
 RestartSec=10
 StandardOutput=journal
@@ -131,6 +166,7 @@ WantedBy=multi-user.target
 ```
 
 **Important**: Replace the following:
+
 - `your-username` - Your server username
 - `/path/to/email-countdown-builder` - Full path to the application directory
 - `/usr/bin/node` - Path to Node.js (find with `which node`)
@@ -194,21 +230,27 @@ GET /timer.png
 
 **Query Parameters:**
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `date` | string | Yes | - | Target date in ISO format (e.g., `2025-12-31T23:59`) |
-| `label` | string | No | "Offer Ends In" | Countdown headline |
-| `template` | string | No | "boxed" | Template style: `boxed`, `minimal`, `minimal-narrow` |
-| `bg` | string | No | `#0f172a` | Background color (hex) |
-| `box` | string | No | `#1e293b` | Box/container color (hex) |
-| `digits` | string | No | `#f8fafc` | Digit text color (hex) |
-| `labels` | string | No | `#cbd5f5` | Label text color (hex) |
-| `accent` | string | No | `#38bdf8` | Accent/headline color (hex) |
+| Parameter  | Type   | Required | Default               | Description                                              |
+| ---------- | ------ | -------- | --------------------- | -------------------------------------------------------- |
+| `target`   | string | Yes      | -                     | Target date in ISO format (e.g., `2025-12-31T23:59:00Z`) |
+| `label`    | string | No       | "Offer Ends In"       | Countdown headline                                       |
+| `template` | string | No       | "boxed"               | Template style: `boxed`, `minimal`, `minimal-narrow`     |
+| `bg`       | string | No       | `#1c1917`             | Background color (hex)                                   |
+| `box`      | string | No       | `#292524`             | Box/container color (hex)                                |
+| `digits`   | string | No       | `#facc15`             | Digit text color (hex)                                   |
+| `labels`   | string | No       | `#a8a29e`             | Label text color (hex)                                   |
+| `accent`   | string | No       | `#facc15`             | Accent/headline color (hex)                              |
+| `font`     | string | No       | "TikTok Sans, Outfit" | Font stack                                               |
 
 **Example:**
 
 ```html
-<img src="https://yourdomain.com/countdown/timer.png?date=2025-12-31T23:59&label=Sale%20Ends&template=minimal&bg=%230f172a&digits=%23ffffff" alt="Countdown Timer">
+<img
+  src="https://yourdomain.com/timer.png?target=2025-12-31T23:59:00Z&label=Sale%20Ends&template=minimal&bg=%231c1917&digits=%23facc15"
+  alt="Countdown Timer"
+  width="600"
+  style="display:block;max-width:100%;height:auto;"
+/>
 ```
 
 #### SVG Endpoint (for web use)
@@ -222,15 +264,18 @@ Same parameters as PNG endpoint. Note: SVG images may be blocked by some email c
 ## Templates
 
 ### Boxed
+
 Classic style with rounded boxes for each time unit. Best for prominent countdowns.
 
 ### Minimal
+
 Clean, spacious design with colon separators. Great for modern email designs.
 
 ### Minimal Narrow
+
 Compact version of Minimal template, ~70% width. Perfect for sidebar or mobile layouts.
 
-## Performance
+## Caching & Performance
 
 - **In-Memory Caching**: 5-second cache reduces server load by ~99% during peak traffic
 - **Efficient Processing**: Sharp library provides fast SVG to PNG conversion
@@ -240,12 +285,21 @@ Compact version of Minimal template, ~70% width. Perfect for sidebar or mobile l
 Check cache performance:
 
 ```bash
-curl -I https://yourdomain.com/countdown/timer.png?date=2025-12-31T23:59 | grep X-Cache
+curl -I https://yourdomain.com/timer.png?target=2025-12-31T23:59:00Z | grep X-Cache
 # First request: X-Cache: MISS
 # Within 5 seconds: X-Cache: HIT
 ```
 
 ## Monitoring
+
+### Health Check
+
+```bash
+curl http://localhost:3000/health
+# Returns: {"status":"ok","uptime":123.45,"memory":{"heapUsedMB":25,"heapTotalMB":50,"rssMB":75}}
+```
+
+### Service Logs
 
 View service logs:
 
@@ -277,6 +331,7 @@ sudo journalctl -u countdown -n 100 --no-pager
 ```
 
 Common issues:
+
 - Port already in use (change PORT in .env)
 - Missing node_modules (run `npm install`)
 - Wrong Node.js path in service file (find with `which node`)

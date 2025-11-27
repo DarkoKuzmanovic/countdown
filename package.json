@@ -2,9 +2,11 @@
   "name": "email-countdown-builder",
   "version": "1.0.0",
   "description": "Self-hosted email countdown timer generator with dynamic SVG/PNG rendering",
-  "main": "server.js",
+  "main": "src/app.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "start:legacy": "node server.js"
   },
   "keywords": [
     "countdown",
@@ -19,7 +21,9 @@
   "type": "commonjs",
   "dependencies": {
     "dayjs": "^1.11.19",
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "nodemon": "^3.1.11",
     "sharp": "^0.34.5"
   }
 }
