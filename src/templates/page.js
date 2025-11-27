@@ -1172,7 +1172,7 @@ function renderPage(data) {
         </ul>
       </div>
       <div class="footer-bottom">
-        Made with ❤️ by <a href="https://sim-lab.eu" target="_blank">Sim-Lab</a> • 
+        Made with ❤️ by <a href="https://sim-lab.eu" target="_blank">Sim-Lab</a> •
         <span class="version-info">Node.js Email Tool</span>
       </div>
     </div>
