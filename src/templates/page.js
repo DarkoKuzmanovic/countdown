@@ -794,20 +794,91 @@ function renderPage(data) {
 
     /* ============ Footer ============ */
     footer {
-      padding: 1.5rem;
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      border-top: 1px solid var(--border-color);
+      padding: 2rem 1.5rem;
       background: var(--card-bg);
+      border-top: 1px solid var(--border-color);
     }
 
-    footer a {
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    .footer-section {
+      font-size: 0.85rem;
+    }
+
+    .footer-section strong {
+      display: block;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .footer-section p {
+      color: var(--text-muted);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .footer-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .footer-section li {
+      margin: 0;
+    }
+
+    .footer-section a {
+      color: var(--accent-color);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-section a:hover {
+      text-decoration: underline;
+      color: var(--accent-color);
+      opacity: 0.8;
+    }
+
+    .param-hint {
+      color: var(--text-muted);
+      font-family: monospace;
+      font-size: 0.8rem;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+      grid-column: 1 / -1;
+    }
+
+    .footer-bottom a {
       color: var(--accent-color);
       text-decoration: none;
     }
 
-    footer a:hover { text-decoration: underline; }
+    .footer-bottom a:hover {
+      text-decoration: underline;
+    }
+
+    .version-info {
+      color: var(--text-muted);
+    }
 
     /* ============ Responsive ============ */
     @media (max-width: 900px) {
@@ -838,6 +909,8 @@ function renderPage(data) {
       .colors-grid { grid-template-columns: 1fr; }
 
       .preview-meta { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+
+      .footer-content { grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1rem; }
     }
 
     /* ============ Pickr Overrides ============ */
@@ -1077,7 +1150,32 @@ function renderPage(data) {
   </form>
 
   <footer>
-    Made with ❤️ by <a href="https://sim-lab.eu" target="_blank">Sim-Lab</a>
+    <div class="footer-content">
+      <div class="footer-section">
+        <strong>Email Countdown Builder</strong>
+        <p>Self-hosted countdown timer generator for email campaigns</p>
+      </div>
+      <div class="footer-section">
+        <strong>Quick Links</strong>
+        <ul>
+          <li><a href="https://github.com/sim-lab/countdown" target="_blank">GitHub</a></li>
+          <li><a href="/health" target="_blank">Health Check</a></li>
+          <li><a href="https://sim-lab.eu" target="_blank">Sim-Lab</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <strong>API Reference</strong>
+        <ul>
+          <li><a href="/timer.png" target="_blank">PNG Endpoint</a></li>
+          <li><a href="/timer.svg" target="_blank">SVG Endpoint</a></li>
+          <li><span class="param-hint">/timer.png?target=ISO&label=Text</span></li>
+        </ul>
+      </div>
+      <div class="footer-bottom">
+        Made with ❤️ by <a href="https://sim-lab.eu" target="_blank">Sim-Lab</a> • 
+        <span class="version-info">Node.js Email Tool</span>
+      </div>
+    </div>
   </footer>
 
   <div id="connectionStatus" class="connection-status">
