@@ -35,6 +35,8 @@ function renderPage(data) {
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Arimo:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.cdnfonts.com/css/tiktok-sans" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css"/>
   <style>
@@ -1005,6 +1007,7 @@ function renderPage(data) {
               <label for="theme">Theme Preset</label>
               <select id="theme">
                 <option value="">Custom</option>
+                <option value="midnight-black">Midnight Black</option>
                 <option value="dark-gold">Dark Gold</option>
                 <option value="midnight-blue">Midnight Blue</option>
                 <option value="forest-green">Forest Green</option>
@@ -1075,10 +1078,69 @@ function renderPage(data) {
 
       <div class="config-section">
         <h3>Typography</h3>
-        <div class="field">
-          <label for="font">Font Stack</label>
-          <input type="text" id="font" name="font" value="${fontValue}">
-          <small>Use web-safe fonts for email compatibility</small>
+        <div class="config-grid">
+          <div class="config-row">
+            <div class="field">
+              <label for="font">Font Family</label>
+              <select id="font" name="font" data-tooltip="Font for digits and labels">
+                <option value="Arial, Helvetica, sans-serif" ${
+                  fontValue.includes("Arial") ? "selected" : ""
+                }>Arial</option>
+                <option value="'Helvetica Neue', Helvetica, sans-serif" ${
+                  fontValue.includes("Helvetica Neue") ? "selected" : ""
+                }>Helvetica Neue</option>
+                <option value="Georgia, 'Times New Roman', serif" ${
+                  fontValue.includes("Georgia") ? "selected" : ""
+                }>Georgia</option>
+                <option value="'Trebuchet MS', sans-serif" ${
+                  fontValue.includes("Trebuchet") ? "selected" : ""
+                }>Trebuchet MS</option>
+                <option value="Verdana, Geneva, sans-serif" ${
+                  fontValue.includes("Verdana") ? "selected" : ""
+                }>Verdana</option>
+                <option value="'Courier New', monospace" ${
+                  fontValue.includes("Courier") ? "selected" : ""
+                }>Courier New</option>
+                <option value="Impact, sans-serif" ${fontValue.includes("Impact") ? "selected" : ""}>Impact</option>
+                <option value="'Lucida Console', Monaco, monospace" ${
+                  fontValue.includes("Lucida") ? "selected" : ""
+                }>Lucida Console</option>
+                <option value="Tahoma, Geneva, sans-serif" ${
+                  fontValue.includes("Tahoma") ? "selected" : ""
+                }>Tahoma</option>
+                <option value="TikTok Sans, 'Outfit', sans-serif" ${
+                  fontValue.includes("TikTok") || fontValue === "TikTok Sans, 'Outfit', sans-serif" ? "selected" : ""
+                }>TikTok Sans</option>
+                <option value="'Inter', sans-serif" ${fontValue.includes("Inter") ? "selected" : ""}>Inter</option>
+                <option value="'Arimo', sans-serif" ${fontValue.includes("Arimo") ? "selected" : ""}>Arimo</option>
+              </select>
+              <small>Web-safe fonts for email compatibility</small>
+            </div>
+            <div class="field">
+              <label for="fontWeight">Font Weight</label>
+              <select id="fontWeight" name="fontWeight" data-tooltip="Weight for digit numbers">
+                <option value="100">Thin (100)</option>
+                <option value="200">Extra Light (200)</option>
+                <option value="300">Light (300)</option>
+                <option value="400">Regular (400)</option>
+                <option value="500">Medium (500)</option>
+                <option value="600">Semi-Bold (600)</option>
+                <option value="700" selected>Bold (700)</option>
+                <option value="800">Extra Bold (800)</option>
+                <option value="900">Black (900)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h3>Spacing</h3>
+        <div class="config-grid">
+          <div class="field">
+            <label for="padding">Horizontal Padding: <span id="padding-value">20</span>px</label>
+            <input type="range" id="padding" name="padding" min="0" max="150" value="20" data-tooltip="Left and right padding from edge">
+          </div>
         </div>
       </div>
 
@@ -1192,6 +1254,7 @@ function renderPage(data) {
     const DEBOUNCE_DELAY = 500;
 
     const COLOR_THEMES = {
+      'midnight-black': { bg: '#000000', box: '#000000', digits: '#ffffff', labels: '#ffffff', accent: '#1eb5fe' },
       'dark-gold': { bg: '#1c1917', box: '#292524', digits: '#facc15', labels: '#a8a29e', accent: '#facc15' },
       'midnight-blue': { bg: '#0f172a', box: '#1e293b', digits: '#38bdf8', labels: '#94a3b8', accent: '#38bdf8' },
       'forest-green': { bg: '#14532d', box: '#166534', digits: '#86efac', labels: '#bbf7d0', accent: '#22c55e' },
@@ -1212,7 +1275,9 @@ function renderPage(data) {
       labels: '#a8a29e',
       accent: '#facc15',
       font: "TikTok Sans, 'Outfit', sans-serif",
+      fontWeight: '700',
       radius: '16',
+      padding: '20',
       labelStyle: 'long'
     };
 
@@ -1365,7 +1430,9 @@ function renderPage(data) {
         labels: values.labels,
         accent: values.accent,
         font: values.font,
+        fontWeight: values.fontWeight || '700',
         radius: values.radius || '16',
+        padding: values.padding || '20',
         labelStyle: values.labelStyle || 'long',
         _: Date.now()
       });
@@ -1384,7 +1451,9 @@ function renderPage(data) {
         labels: values.labels,
         accent: values.accent,
         font: values.font,
+        fontWeight: values.fontWeight || '700',
         radius: values.radius || '16',
+        padding: values.padding || '20',
         labelStyle: values.labelStyle || 'long',
       });
       const baseParams = params.toString();
@@ -1406,7 +1475,9 @@ function renderPage(data) {
         labels: values.labels,
         accent: values.accent,
         font: values.font,
+        fontWeight: values.fontWeight || '700',
         radius: values.radius || '16',
+        padding: values.padding || '20',
         labelStyle: values.labelStyle || 'long',
       });
       const url = window.location.origin + '/timer.png?' + params.toString();
@@ -1426,6 +1497,10 @@ function renderPage(data) {
         labels: values.labels,
         accent: values.accent,
         font: values.font,
+        fontWeight: values.fontWeight || '700',
+        radius: values.radius || '16',
+        padding: values.padding || '20',
+        labelStyle: values.labelStyle || 'long',
       });
       const pngUrl = window.location.origin + '/timer.png?' + params.toString();
       const alt = values.label || 'Countdown Timer';
@@ -1441,10 +1516,30 @@ function renderPage(data) {
     let currentSnippets = { html: '', markdown: '', url: '' };
 
     // ============ Preview Updates ============
+    let retryTimeout = null;
+    let currentLoadingImg = null;
+
     function updatePreview() {
       const values = getFormValues();
       const url = buildPreviewUrl(values);
       const urls = buildTimerUrls(values);
+
+      // Cancel any pending retry
+      if (retryTimeout) {
+        clearTimeout(retryTimeout);
+        retryTimeout = null;
+      }
+
+      // Abort previous image load if still pending
+      if (currentLoadingImg) {
+        currentLoadingImg.onload = null;
+        currentLoadingImg.onerror = null;
+        currentLoadingImg = null;
+      }
+
+      // Reset error state immediately on new update
+      retryCount = 0;
+      previewError.style.display = 'none';
 
       // Update URLs for download/open
       currentSvgUrl = urls.svg;
@@ -1467,7 +1562,13 @@ function renderPage(data) {
       }
 
       const img = new Image();
+      currentLoadingImg = img;
+
       img.onload = () => {
+        // Ignore if this is not the current loading image
+        if (currentLoadingImg !== img) return;
+        currentLoadingImg = null;
+
         previewImg.src = url;
         previewImg.style.opacity = '1';
         previewLoader.style.display = 'none';
@@ -1495,6 +1596,10 @@ function renderPage(data) {
         previewError.style.display = 'none';
       };
       img.onerror = () => {
+        // Ignore if this is not the current loading image (was cancelled)
+        if (currentLoadingImg !== img) return;
+        currentLoadingImg = null;
+
         previewLoader.style.display = 'none';
         previewSkeleton.style.display = 'none';
         previewContainer.classList.remove('updating');
@@ -1509,7 +1614,7 @@ function renderPage(data) {
           retryCount++;
           previewError.querySelector('.error-text').textContent =
             'Failed to load preview. Retrying... (' + retryCount + '/' + MAX_RETRIES + ')';
-          setTimeout(updatePreview, 1000 * retryCount); // Exponential backoff
+          retryTimeout = setTimeout(updatePreview, 1000 * retryCount); // Exponential backoff
         } else {
           previewError.querySelector('.error-text').textContent =
             'Failed to load preview. Check your connection.';
@@ -1662,20 +1767,15 @@ function renderPage(data) {
 
         pickers[field] = pickr;
 
-        pickr.on('change', (color) => {
-          const hexColor = color.toHEXA().toString().toUpperCase();
-          textInput.value = hexColor;
-          themeSelect.value = '';
-          debouncedUpdatePreview();
-        });
-
+        // Only update HEX input and preview when Save is clicked
         pickr.on('save', (color) => {
           if (color) {
             const hexColor = color.toHEXA().toString().toUpperCase();
             textInput.value = hexColor;
+            themeSelect.value = '';
+            debouncedUpdatePreview();
           }
           pickr.hide();
-          debouncedUpdatePreview();
         });
 
         textInput.addEventListener('input', (e) => {
@@ -1708,6 +1808,15 @@ function renderPage(data) {
     if (radiusSlider && radiusValue) {
       radiusSlider.addEventListener('input', (e) => {
         radiusValue.textContent = e.target.value;
+      });
+    }
+
+    // Padding slider value display
+    const paddingSlider = document.getElementById('padding');
+    const paddingValue = document.getElementById('padding-value');
+    if (paddingSlider && paddingValue) {
+      paddingSlider.addEventListener('input', (e) => {
+        paddingValue.textContent = e.target.value;
       });
     }
 

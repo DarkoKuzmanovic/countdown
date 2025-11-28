@@ -32,12 +32,35 @@ function parseTimerParams(req) {
   const accent = sanitizeColor(req.query.accent, DEFAULT_STYLE.accent);
   const font = sanitizeFont(req.query.font, DEFAULT_STYLE.font);
 
-  // New parameters: radius and labelStyle
+  // New parameters: radius, labelStyle, fontWeight, padding
   const radiusParam = parseInt(req.query.radius, 10);
   const radius = !isNaN(radiusParam) && radiusParam >= 0 && radiusParam <= 50 ? radiusParam : 16;
   const labelStyle = req.query.labelStyle === "short" ? "short" : "long";
 
-  return { label, target, template, background, box, digits, labelsColor, accent, font, radius, labelStyle };
+  // Font weight: 400-900
+  const fontWeightParam = parseInt(req.query.fontWeight, 10);
+  const fontWeight =
+    !isNaN(fontWeightParam) && fontWeightParam >= 100 && fontWeightParam <= 900 ? fontWeightParam : 700;
+
+  // Horizontal padding: 0-150px
+  const paddingParam = parseInt(req.query.padding, 10);
+  const padding = !isNaN(paddingParam) && paddingParam >= 0 && paddingParam <= 150 ? paddingParam : 20;
+
+  return {
+    label,
+    target,
+    template,
+    background,
+    box,
+    digits,
+    labelsColor,
+    accent,
+    font,
+    radius,
+    labelStyle,
+    fontWeight,
+    padding,
+  };
 }
 
 /**
@@ -70,7 +93,7 @@ router.get("/timer.svg", corsHeaders, (req, res) => {
     labelsColor: params.labelsColor,
     accent: params.accent,
   };
-  const options = { radius: params.radius };
+  const options = { radius: params.radius, fontWeight: params.fontWeight, padding: params.padding };
 
   const svg = renderTemplate(params.template, segments, params.label, colors, params.font, options);
 
@@ -105,7 +128,7 @@ router.get("/timer.png", corsHeaders, async (req, res) => {
       labelsColor: params.labelsColor,
       accent: params.accent,
     };
-    const options = { radius: params.radius };
+    const options = { radius: params.radius, fontWeight: params.fontWeight, padding: params.padding };
 
     const svg = renderTemplate(params.template, segments, params.label, colors, params.font, options);
 

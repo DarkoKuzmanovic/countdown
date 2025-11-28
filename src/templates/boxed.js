@@ -10,21 +10,23 @@ const { escapeHtml } = require("../utils/html");
  * @param {string} label - Header label
  * @param {Object} colors - Color configuration
  * @param {string} font - Font stack
- * @param {Object} options - Additional options (radius)
+ * @param {Object} options - Additional options (radius, fontWeight, padding)
  * @returns {string} SVG string
  */
 function renderBoxedTemplate(segments, label, colors, font, options = {}) {
   const { background, box, digits, labelsColor, accent } = colors;
   const radius = options.radius !== undefined ? options.radius : 16;
+  const fontWeight = options.fontWeight !== undefined ? options.fontWeight : 700;
+  const padding = options.padding !== undefined ? options.padding : 20;
   const outerRadius = Math.min(radius * 1.75, 28);
   const gap = 18;
   const boxWidth = 150;
   const boxHeight = 110;
-  const svgWidth = gap + segments.length * (boxWidth + gap);
+  const svgWidth = padding * 2 + segments.length * (boxWidth + gap) - gap + gap;
   const hasLabel = label && label.trim().length > 0;
   const svgHeight = hasLabel ? 220 : 160;
   const boxesY = hasLabel ? 75 : 20;
-  let cursorX = gap;
+  let cursorX = padding;
 
   const boxes = segments
     .map((segment) => {
@@ -32,7 +34,7 @@ function renderBoxedTemplate(segments, label, colors, font, options = {}) {
         <rect rx="${radius}" ry="${radius}" width="${boxWidth}" height="${boxHeight}" fill="${box}"></rect>
         <text x="${
           boxWidth / 2
-        }" y="60" text-anchor="middle" font-size="42" font-weight="700" fill="${digits}" font-family="${font}">${
+        }" y="60" text-anchor="middle" font-size="42" font-weight="${fontWeight}" fill="${digits}" font-family="${font}">${
         segment.value
       }</text>
         <text x="${

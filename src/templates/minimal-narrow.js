@@ -10,26 +10,28 @@ const { escapeHtml } = require("../utils/html");
  * @param {string} label - Header label
  * @param {Object} colors - Color configuration
  * @param {string} font - Font stack
- * @param {Object} options - Additional options (radius)
+ * @param {Object} options - Additional options (radius, fontWeight, padding)
  * @returns {string} SVG string
  */
 function renderMinimalNarrowTemplate(segments, label, colors, font, options = {}) {
   const { background, digits, labelsColor, accent } = colors;
   const radius = options.radius !== undefined ? options.radius : 24;
+  const fontWeight = options.fontWeight !== undefined ? options.fontWeight : 700;
+  const padding = options.padding !== undefined ? options.padding : 20;
   const segmentWidth = 75;
   const separatorWidth = 20;
-  const svgWidth = 40 + segments.length * segmentWidth + (segments.length - 1) * separatorWidth;
+  const svgWidth = padding * 2 + segments.length * segmentWidth + (segments.length - 1) * separatorWidth;
   const hasLabel = label && label.trim().length > 0;
   const svgHeight = hasLabel ? 180 : 140;
   const itemsY = hasLabel ? 60 : 30;
-  let cursorX = 20;
+  let cursorX = padding;
 
   const items = [];
   segments.forEach((segment, index) => {
     items.push(`<g transform="translate(${cursorX},${itemsY})">
       <text x="${
         segmentWidth / 2
-      }" y="50" text-anchor="middle" font-size="52" font-weight="700" fill="${digits}" font-family="${font}">${
+      }" y="50" text-anchor="middle" font-size="52" font-weight="${fontWeight}" fill="${digits}" font-family="${font}">${
       segment.value
     }</text>
       <text x="${
