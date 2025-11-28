@@ -17,6 +17,10 @@ function renderPage(data) {
   const labelsValue = escapeHtml(data.labels);
   const accentValue = escapeHtml(data.accent);
   const fontValue = escapeHtml(data.font);
+  const radiusValue = data.radius !== undefined ? data.radius : 16;
+  const labelStyleValue = data.labelStyle || "long";
+  const fontWeightValue = data.fontWeight !== undefined ? data.fontWeight : 700;
+  const paddingValue = data.padding !== undefined ? data.padding : 20;
   const previewUrl = escapeHtml(data.previewUrl);
   const snippetValue = escapeHtml(data.snippet);
   const formDateValue = escapeHtml(data.formDate);
@@ -1021,14 +1025,14 @@ function renderPage(data) {
           </div>
           <div class="config-row">
             <div class="field">
-              <label for="radius">Corner Radius: <span id="radius-value">16</span>px</label>
-              <input type="range" id="radius" name="radius" min="0" max="50" value="16" data-tooltip="Roundness of timer corners">
+              <label for="radius">Corner Radius: <span id="radius-value">${radiusValue}</span>px</label>
+              <input type="range" id="radius" name="radius" min="0" max="50" value="${radiusValue}" data-tooltip="Roundness of timer corners">
             </div>
             <div class="field">
               <label for="labelStyle">Unit Labels</label>
               <select id="labelStyle" name="labelStyle" data-tooltip="Label format for time units">
-                <option value="long">Long (Days, Hours...)</option>
-                <option value="short">Short (D, H, M, S)</option>
+                <option value="long" ${labelStyleValue === "long" ? "selected" : ""}>Long (Days, Hours...)</option>
+                <option value="short" ${labelStyleValue === "short" ? "selected" : ""}>Short (D, H, M, S)</option>
               </select>
             </div>
           </div>
@@ -1119,15 +1123,15 @@ function renderPage(data) {
             <div class="field">
               <label for="fontWeight">Font Weight</label>
               <select id="fontWeight" name="fontWeight" data-tooltip="Weight for digit numbers">
-                <option value="100">Thin (100)</option>
-                <option value="200">Extra Light (200)</option>
-                <option value="300">Light (300)</option>
-                <option value="400">Regular (400)</option>
-                <option value="500">Medium (500)</option>
-                <option value="600">Semi-Bold (600)</option>
-                <option value="700" selected>Bold (700)</option>
-                <option value="800">Extra Bold (800)</option>
-                <option value="900">Black (900)</option>
+                <option value="100" ${fontWeightValue === 100 ? "selected" : ""}>Thin (100)</option>
+                <option value="200" ${fontWeightValue === 200 ? "selected" : ""}>Extra Light (200)</option>
+                <option value="300" ${fontWeightValue === 300 ? "selected" : ""}>Light (300)</option>
+                <option value="400" ${fontWeightValue === 400 ? "selected" : ""}>Regular (400)</option>
+                <option value="500" ${fontWeightValue === 500 ? "selected" : ""}>Medium (500)</option>
+                <option value="600" ${fontWeightValue === 600 ? "selected" : ""}>Semi-Bold (600)</option>
+                <option value="700" ${fontWeightValue === 700 ? "selected" : ""}>Bold (700)</option>
+                <option value="800" ${fontWeightValue === 800 ? "selected" : ""}>Extra Bold (800)</option>
+                <option value="900" ${fontWeightValue === 900 ? "selected" : ""}>Black (900)</option>
               </select>
             </div>
           </div>
@@ -1138,8 +1142,8 @@ function renderPage(data) {
         <h3>Spacing</h3>
         <div class="config-grid">
           <div class="field">
-            <label for="padding">Horizontal Padding: <span id="padding-value">20</span>px</label>
-            <input type="range" id="padding" name="padding" min="0" max="150" value="20" data-tooltip="Left and right padding from edge">
+            <label for="padding">Horizontal Padding: <span id="padding-value">${paddingValue}</span>px</label>
+            <input type="range" id="padding" name="padding" min="0" max="150" value="${paddingValue}" data-tooltip="Left and right padding from edge">
           </div>
         </div>
       </div>
@@ -1419,7 +1423,16 @@ function renderPage(data) {
     }
 
     function buildPreviewUrl(values) {
-      const target = new Date(values.date).toISOString();
+      if (!values.date) {
+        console.error('No date value found');
+        return null;
+      }
+      const targetDate = new Date(values.date);
+      if (isNaN(targetDate.getTime())) {
+        console.error('Invalid date value:', values.date);
+        return null;
+      }
+      const target = targetDate.toISOString();
       const params = new URLSearchParams({
         target,
         label: values.label || '',
@@ -1436,11 +1449,14 @@ function renderPage(data) {
         labelStyle: values.labelStyle || 'long',
         _: Date.now()
       });
-      return '/timer.svg?' + params.toString();
+      return 'timer.svg?' + params.toString();
     }
 
     function buildTimerUrls(values) {
-      const target = new Date(values.date).toISOString();
+      if (!values.date) return { svg: '', png: '' };
+      const targetDate = new Date(values.date);
+      if (isNaN(targetDate.getTime())) return { svg: '', png: '' };
+      const target = targetDate.toISOString();
       const params = new URLSearchParams({
         target,
         label: values.label || '',
@@ -1457,9 +1473,13 @@ function renderPage(data) {
         labelStyle: values.labelStyle || 'long',
       });
       const baseParams = params.toString();
+      // Get base URL from current page, removing any query params
+      const baseHref = window.location.href.split('?')[0];
+      // If it ends with /, keep it; otherwise add /
+      const baseUrl = baseHref.endsWith('/') ? baseHref.slice(0, -1) : baseHref;
       return {
-        svg: window.location.origin + '/timer.svg?' + baseParams,
-        png: window.location.origin + '/timer.png?' + baseParams
+        svg: baseUrl + '/timer.svg?' + baseParams,
+        png: baseUrl + '/timer.png?' + baseParams
       };
     }
 
@@ -1486,7 +1506,10 @@ function renderPage(data) {
     }
 
     function buildSnippetFormats(values) {
-      const target = new Date(values.date).toISOString();
+      if (!values.date) return { html: '', markdown: '', url: '' };
+      const targetDate = new Date(values.date);
+      if (isNaN(targetDate.getTime())) return { html: '', markdown: '', url: '' };
+      const target = targetDate.toISOString();
       const params = new URLSearchParams({
         target,
         label: values.label || '',
@@ -1502,7 +1525,11 @@ function renderPage(data) {
         padding: values.padding || '20',
         labelStyle: values.labelStyle || 'long',
       });
-      const pngUrl = window.location.origin + '/timer.png?' + params.toString();
+      // Get base URL from current page, removing any query params
+      const baseHref = window.location.href.split('?')[0];
+      // If it ends with /, keep it; otherwise add /
+      const baseUrl = baseHref.endsWith('/') ? baseHref.slice(0, -1) : baseHref;
+      const pngUrl = baseUrl + '/timer.png?' + params.toString();
       const alt = values.label || 'Countdown Timer';
 
       return {
@@ -1523,6 +1550,14 @@ function renderPage(data) {
       const values = getFormValues();
       const url = buildPreviewUrl(values);
       const urls = buildTimerUrls(values);
+
+      // If URL is invalid, show error and return
+      if (!url) {
+        console.error('Cannot build preview URL - invalid form values');
+        previewError.style.display = 'flex';
+        previewError.querySelector('.error-text').textContent = 'Invalid date or form values';
+        return;
+      }
 
       // Cancel any pending retry
       if (retryTimeout) {

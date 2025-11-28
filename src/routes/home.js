@@ -34,6 +34,19 @@ function buildTimerParameters(req) {
   const accent = sanitizeColor(req.query.accent, DEFAULT_STYLE.accent);
   const font = sanitizeFont(req.query.font, DEFAULT_STYLE.font);
 
+  // Additional styling parameters
+  const radiusParam = parseInt(req.query.radius, 10);
+  const radius = !isNaN(radiusParam) && radiusParam >= 0 && radiusParam <= 50 ? radiusParam : 16;
+
+  const labelStyle = req.query.labelStyle === "short" ? "short" : "long";
+
+  const fontWeightParam = parseInt(req.query.fontWeight, 10);
+  const fontWeight =
+    !isNaN(fontWeightParam) && fontWeightParam >= 100 && fontWeightParam <= 900 ? fontWeightParam : 700;
+
+  const paddingParam = parseInt(req.query.padding, 10);
+  const padding = !isNaN(paddingParam) && paddingParam >= 0 && paddingParam <= 150 ? paddingParam : 20;
+
   const requestedDate = typeof req.query.date === "string" ? req.query.date : null;
   let targetMoment;
   if (requestedDate) {
@@ -53,6 +66,10 @@ function buildTimerParameters(req) {
     labels,
     accent,
     font,
+    radius,
+    labelStyle,
+    fontWeight,
+    padding,
     targetMoment,
   };
 }
@@ -73,6 +90,10 @@ router.get("/", (req, res) => {
     labels: params.labels,
     accent: params.accent,
     font: params.font,
+    radius: params.radius,
+    labelStyle: params.labelStyle,
+    fontWeight: params.fontWeight,
+    padding: params.padding,
   });
   const imageUrlPng = `${baseUrl}/timer.png?${search.toString()}`;
   const imageUrlSvg = `${baseUrl}/timer.svg?${search.toString()}`;
@@ -89,6 +110,10 @@ router.get("/", (req, res) => {
     labels: params.labels,
     accent: params.accent,
     font: params.font,
+    radius: params.radius,
+    labelStyle: params.labelStyle,
+    fontWeight: params.fontWeight,
+    padding: params.padding,
     formDate: formatDateTimeLocal(params.targetMoment, params.timezone),
     snippet: buildSnippet(imageUrlPng, params.label),
     previewUrl,
